@@ -1,0 +1,37 @@
+.dashboard {
+	overflow-x: auto;
+	display: flex;
+	height: 100vh;
+	width: 100%;
+  }
+  
+  .navbar {
+	z-index: 1;
+	top: 0;
+	flex: 1 1 auto;
+	width: 100%;
+  }
+  
+  .main-content {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	overflow-y: scroll;
+	overflow-x: auto;
+  }
+
+  .react-calendar-left {
+    width: 250px !important;
+    height: 300px !important;
+    margin: 2%;
+  }
+
+  .react-calendar-right{
+    width: 800px !important;
+    height: 600px !important;
+    margin: 2%;
+  }
+
+  .react-calendar-right{
+    height: 500px;
+  }

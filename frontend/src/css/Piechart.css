@@ -1,0 +1,9 @@
+/* Add this CSS to your stylesheet or inline styles */
+@media only screen and (max-width: 767px) {
+    .pie-chart-container {
+      width: 100%;
+      max-width: 400px;
+      margin: auto;
+    }
+  }
+  

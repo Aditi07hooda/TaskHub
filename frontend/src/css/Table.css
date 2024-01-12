@@ -1,0 +1,36 @@
+/* TaskManagerTable.css */
+
+.task-manager-table-container {
+    display: flex;
+    justify-content: flex-start;
+    margin: 3rem; /* Adjust margin as needed */
+  }
+  
+  .task-manager-table {
+    width: 100%; /* Adjust width as needed */
+    border-collapse: collapse;
+  }
+  
+  .task-manager-table th,
+  .task-manager-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .task-manager-table th {
+    background-color: #f2f2f2;
+  }
+  
+  .task-manager-table button {
+    background-color: #f44336;
+    color: white;
+    padding: 6px 10px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .task-manager-table button:hover {
+    background-color: #d32f2f;
+  }
+  
