@@ -1,18 +1,20 @@
 import taskdb from "../models/TaskDb.js";
 
-const insertTask = (todoitem) => {
+const insertTask = (todoitem, user_id, callback) => {
   taskdb.query(
-    "INSERT INTO Task (id, title, description, due_date) VALUES (?, ?, ?, ?)",
-    [todoitem.id, todoitem.title, todoitem.description, todoitem.enddate],
+    "INSERT INTO Task (id, user_id, title, description, due_date) VALUES (?, ?, ?, ?, ?)",
+    [todoitem.id, user_id, todoitem.title, todoitem.description, todoitem.enddate],
     (error, results, fields) => {
       if (error) {
         console.error("Error creating task:", error);
+        callback(error);
       } else {
         console.log("New task added in db");
       }
     }
   );
 };
+
 
 const deleteTask = (id, callback) => {
   taskdb.query(
@@ -65,4 +67,19 @@ const updateTask = (id, updatedTask, callback) => {
   });
 };
 
-export { insertTask, deleteTask, updateTask };
+const readTask = (user_id, callback) => {
+  taskdb.query(
+    "SELECT * FROM Task WHERE user_id = ?",
+    [user_id],
+    (error, results, fields) => {
+      if (error) {
+        callback(error, null);
+      } else {
+        callback(null, results);
+      }
+    }
+  );
+};
+
+
+export { insertTask, deleteTask, updateTask, readTask };

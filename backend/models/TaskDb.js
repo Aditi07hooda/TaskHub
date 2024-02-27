@@ -3,12 +3,14 @@ import { connection } from "../config/databaseConnection.js";
 const createTaskTableQuery = `
   CREATE TABLE IF NOT EXISTS Task (
     id INT PRIMARY KEY,
+    user_id INT(4) ZEROFILL,
     title VARCHAR(255) NOT NULL,
     description TEXT,
     due_date DATE,
     status ENUM('pending', 'completed') DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
   )
 `;
 

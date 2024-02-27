@@ -3,13 +3,21 @@ import {
   insertTask,
   deleteTask,
   updateTask,
+  readTask
 } from "../middlewares/TaskDbFunc.js";
 
 const todolist = [];
 const pendingtodolist = [];
 
 export const readtask = (req, res) => {
-  res.send(todolist);
+  const user_id = req.user.user_id;
+  readTask(user_id, (error, tasks) => {
+    if (error) {
+      console.error("Error fetching tasks:", error);
+      return res.status(500).send("Internal Server Error");
+    }
+    res.send(tasks);
+  });
 };
 
 export const createtask = (req, res) => {
@@ -19,7 +27,9 @@ export const createtask = (req, res) => {
     description: req.body.description,
     enddate: req.body.enddate,
   };
-  insertTask(todoitem);
+
+  const user_id = req.user.user_id;
+  insertTask(todoitem, user_id);
   res.send("New task added");
 };
 

@@ -1,9 +1,11 @@
 import express from "express";
-import task from "./Routes/Task.js";
-import user from "./Routes/Users.js";
 import { connection } from "./config/databaseConnection.js";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import user from "./Routes/Users.js";
+import task from "./Routes/Task.js";
+import event from "./Routes/Event.js"
+import project from "./Routes/Project.js";
 
 const app = express();
 
@@ -26,8 +28,10 @@ app.use(
   })
 );
 
-app.use(task);
 app.use(user);
+app.use(task);
+app.use(event);
+app.use(project);
 
 connection.connect((err) => {
   if (err) {
