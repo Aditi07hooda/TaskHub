@@ -32,7 +32,7 @@ const Sidebar = () => {
           <CDBSidebarMenu>
             <NavLink
               exact
-              to="/"
+              to="/dashboard"
               activeClassName="activeClicked"
             >
               <CDBSidebarMenuItem

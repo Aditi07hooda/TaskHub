@@ -7,4 +7,7 @@ export default defineConfig({
     react(),
     WindiCSS(),
   ],
+  optimizeDeps: {
+    include: ["jwt-decode"]
+  }
 });

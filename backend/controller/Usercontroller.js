@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import userdb from "../models/UserDb.js"
-import { connection } from "../config/databaseConnection.js"
+import userdb from "../models/UserDb.js";
+import { connection } from "../config/databaseConnection.js";
 
 export const usersignin = (req, res) => {
   const emailId = req.body.email;
@@ -27,10 +27,10 @@ export const usersignin = (req, res) => {
       );
 
       if (!passwordMatch) {
-        res.status(404).send("Password didnot match")
+        res.status(404).send("Password didnot match");
       }
 
-      const token = jwt.sign({ user_id: user.user_id }, process.env.JWT_SECRET);
+      const token = jwt.sign({ user_id: user.user_id, name: user.user_name, email: user.email }, process.env.JWT_SECRET);
       res.cookie("token", token, {
         httpOnly: true,
         expires: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
@@ -63,7 +63,9 @@ export const usersignup = (req, res) => {
         req.body.password === req.body.confirmpassword;
 
       if (!confirmpasswordmatch) {
-        res.status(404).json({ message: "confirmPasswrod and password didn't match" });
+        res
+          .status(404)
+          .json({ message: "confirmPasswrod and password didn't match" });
         return;
       }
       const hashpassword = await bcrypt.hash(req.body.password, 10);
@@ -79,20 +81,24 @@ export const usersignup = (req, res) => {
 
           const userId = results.insertId;
 
-          const token = jwt.sign({ user_id: userId }, process.env.JWT_SECRET);
+          const token = jwt.sign(
+            { user_id: userId, name: req.body.name, email: req.body.name },
+            process.env.JWT_SECRET
+          );
 
           res.cookie("token", token, {
             httpOnly: true,
             expires: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
           });
 
-          res.status(200).json({ message: `New user created ${req.body.name}` });
+          res
+            .status(200)
+            .json({ message: `New user created ${req.body.name}` });
         }
       );
     }
   );
 };
-
 
 export const usersignout = (req, res) => {
   res.cookie("token", null, {
@@ -104,9 +110,25 @@ export const usersignout = (req, res) => {
 
 export const userDetail = (req, res) => {
   const { token } = req.cookies;
-  if(!token){
-    res.status(404).send("Not found")
-  }
-  res.send("token found");
-};
 
+  if (!token) {
+    res.status(404).send("Not found");
+    return;
+  }
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) {
+      res.status(401).send("Unauthorized");
+      return;
+    }
+    if (!decoded) {
+      // If the token is not valid or expired, you may want to clear user data
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
+    res.json({
+      user_id: decoded.user_id,
+      name: decoded.name,
+      email: decoded.email,
+    });
+  });
+};
