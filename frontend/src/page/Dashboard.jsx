@@ -7,8 +7,10 @@ import Piechart from "../components/Piechart";
 import Barchart from "../components/Barchart";
 import Table from "../components/Tables";
 import { CDBCard, CDBCardBody, CDBContainer } from "cdbreact";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { useNavigate } from "react-router-dom";
+import { taskList, taskIndividual } from "../state/Task.jsx";
+import axios from "axios";
 
 export default function Dashboard() {
   const isAuthenticated = useRecoilValue(isAuthenticatedUser);
@@ -19,35 +21,13 @@ export default function Dashboard() {
     }
   }, [isAuthenticated]);
 
-  const [tasks, setTasks] = useState([
-    {
-      id: 1,
-      taskName: "Complete Project",
-      assignedDate: "2023-01-01",
-      deadline: "2023-01-10",
-      status: "In Progress",
-      area: "Finance",
-    },
-    {
-      id: 2,
-      taskName: "Complete Project",
-      assignedDate: "2023-01-01",
-      deadline: "2023-01-10",
-      status: "In Progress",
-      area: "Finance",
-    },
-    {
-      id: 3,
-      taskName: "Complete Project",
-      assignedDate: "2023-01-01",
-      deadline: "2023-01-10",
-      status: "In Progress",
-      area: "Finance",
-    },
-  ]);
+  const [tasks, setTasks] = useRecoilState(taskList);
 
-  const handleDelete = (taskId) => {
-    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
+  const handleDelete = async (taskId) => {
+    await axios.delete(`http://localhost:5001/todos/${taskId}`, {
+      withCredentials: true,
+    });
+    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId))
   };
 
   return (

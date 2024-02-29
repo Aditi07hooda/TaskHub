@@ -17,7 +17,7 @@ router.get("/todos", isAuthenticated, readtask);
 
 router.post("/todos", TaskAuthentication, isAuthenticated, createtask);
 
-router.delete("/todos", isAuthenticated, deletetask);
+router.delete("/todos/:taskId", isAuthenticated, deletetask);
 
 router.put("/todos", updateTaskValidation, isAuthenticated, updatetask);
 

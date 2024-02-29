@@ -34,7 +34,7 @@ export const createtask = (req, res) => {
 };
 
 export const deletetask = (req, res) => {
-  const id = req.body.id;
+  const id = req.params.taskId;
   deleteTask(id, (error) => {
     if (error) {
       res.status(404).send("Deletion unsuccessful");
