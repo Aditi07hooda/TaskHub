@@ -80,5 +80,20 @@ const readTask = (user_id, callback) => {
   );
 };
 
+const readTaskById = (user_id, taskId, callback) => {
+  taskdb.query(
+    "SELECT * FROM Task WHERE user_id = ? AND id = ?",
+    [user_id, taskId],
+    (error, results, fields) => {
+      if (error) {
+        console.error("Error reading task:", error);
+        callback(error, null);
+      } else {
+        callback(null, results);
+      }
+    }
+  );
+};
 
-export { insertTask, deleteTask, updateTask, readTask };
+
+export { insertTask, deleteTask, updateTask, readTask, readTaskById };

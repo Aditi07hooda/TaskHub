@@ -7,14 +7,13 @@ import axios from "axios";
 import { format } from "date-fns";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { eventIndividual, eventList } from "../state/Event";
+import Loading from "./Loading.jsx"
 
-export default function EventUpdate() {
-  const eventId = "2660";
-  const eventIdNumber = parseInt(eventId);
-  const event = useRecoilValue(eventIndividual(eventId));
+export default function EventUpdate({eventid}) {
 
-  if (!event) return <div>Loading...</div>;
+  console.log(eventid)
 
+  const [event, setEvent] = useState(null);
   const [events, setEvents] = useRecoilState(eventList);
   const [fromSelectedDate, setFromSelectedDate] = useState(null);
   const [endSelectedDate, setEndSelectedDate] = useState(null);
@@ -23,11 +22,29 @@ export default function EventUpdate() {
   const [location, setLocation] = useState("");
 
   useEffect(() => {
-    setTitle(event.title || "");
-    setDescription(event.description || "");
-    setLocation(event.location || "");
-    setFromSelectedDate(event.fromdate ? new Date(event.fromdate) : null);
-    setEndSelectedDate(event.enddate ? new Date(event.enddate) : null);
+    const fetchEvent = async () => {
+      try {
+        const eventId = eventid
+        const response = await axios.get(`http://localhost:5001/event/${eventId}`, {
+          withCredentials: true,
+        });
+        setEvent(response.data);
+      } catch (error) {
+        console.error('Error fetching event:', error);
+      }
+    };
+    
+    fetchEvent();
+  }, [eventid]);
+  
+  useEffect(() => {
+    if (event) {
+      setTitle(event[0].title || "");
+      setDescription(event[0].description || "");
+      setLocation(event[0].location || "");
+      setFromSelectedDate(event[0].fromdate ? new Date(event[0].fromdate) : null);
+      setEndSelectedDate(event[0].enddate ? new Date(event[0].enddate) : null);
+    }
   }, [event]);
 
   const handleFromDateChange = (date) => {
@@ -47,7 +64,7 @@ export default function EventUpdate() {
       const formattedEndDate = endSelectedDate
         ? format(endSelectedDate, "yyyy-MM-dd")
         : null;
-
+      const eventId = eventid
       const response = await axios.put(
         `http://localhost:5001/event/${eventId}`,
         {
@@ -92,13 +109,14 @@ export default function EventUpdate() {
   };
 
   return (
-    <div>
+   <>
+   {event ? ( <div>
       <section className="bg-white dark:bg-gray-900">
         <div className="py-8 px-4 mx-auto max-w-2xl lg:py-16">
           <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
             Update Event
           </h2>
-          <form action="#">
+          <form action="PUT">
             <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
               <div className="sm:col-span-2">
                 <label
@@ -119,8 +137,8 @@ export default function EventUpdate() {
                 />
               </div>
 
-              <div className="flex space-x-28">
-                <div className="relative max-w-sm">
+              <div className="flex space-x-4">
+                <div className="relative">
                   <div className="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
                     <svg
                       className="w-4 h-4 text-gray-500 dark:text-gray-400"
@@ -136,12 +154,12 @@ export default function EventUpdate() {
                     selected={fromSelectedDate}
                     onChange={handleFromDateChange}
                     dateFormat="yyyy/MM/dd"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 flex-1"
                     placeholderText="Select from date"
                   />
                 </div>
 
-                <div className="relative max-w-sm">
+                <div className="relative">
                   <div className="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
                     <svg
                       className="w-4 h-4 text-gray-500 dark:text-gray-400"
@@ -157,7 +175,7 @@ export default function EventUpdate() {
                     selected={endSelectedDate}
                     onChange={handleEndDateChange}
                     dateFormat="yyyy/MM/dd"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 flex-1"
                     placeholderText="Select end date"
                   />
                 </div>
@@ -210,6 +228,7 @@ export default function EventUpdate() {
         </div>
       </section>
       <ToastContainer />
-    </div>
+    </div>) : <Loading />}
+   </>
   );
 }

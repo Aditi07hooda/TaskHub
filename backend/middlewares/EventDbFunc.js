@@ -33,10 +33,8 @@ const deleteEvent = (id, callback) => {
         callback(error);
       } else {
         if (results.affectedRows > 0) {
-          console.log(`event with ID ${id} deleted`);
           callback(null);
         } else {
-          console.log(`No event found with ID ${id}`);
           callback(new Error(`No event found with ID ${id}`));
         }
       }
@@ -83,7 +81,6 @@ const readEvent = (user_id, callback) => {
         console.error("Error reading events:", error);
         callback(error, null);
       } else {
-        console.log("Read events successfully:", results);
         callback(null, results);
       }
     }
@@ -99,7 +96,6 @@ const readEventById = (user_id, eventId, callback) => {
         console.error("Error reading events:", error);
         callback(error, null);
       } else {
-        console.log("Read events successfully:", results);
         callback(null, results);
       }
     }

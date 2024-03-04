@@ -6,6 +6,7 @@ import {
   createtask,
   deletetask,
   pending,
+  readTaskIndividual,
   readtask,
   updatetask,
 } from "../controller/Taskcontroller.js";
@@ -15,11 +16,13 @@ const router = express.Router();
 
 router.get("/todos", isAuthenticated, readtask);
 
+router.get("/todos/:taskId", isAuthenticated, readTaskIndividual);
+
 router.post("/todos", TaskAuthentication, isAuthenticated, createtask);
 
 router.delete("/todos/:taskId", isAuthenticated, deletetask);
 
-router.put("/todos", updateTaskValidation, isAuthenticated, updatetask);
+router.put("/todos/:taskId", updateTaskValidation, isAuthenticated, updatetask);
 
 router.get("/todos/pending", isAuthenticated, pending);
 

@@ -3,7 +3,8 @@ import {
   insertTask,
   deleteTask,
   updateTask,
-  readTask
+  readTask,
+  readTaskById
 } from "../middlewares/TaskDbFunc.js";
 
 const todolist = [];
@@ -14,6 +15,18 @@ export const readtask = (req, res) => {
   readTask(user_id, (error, tasks) => {
     if (error) {
       console.error("Error fetching tasks:", error);
+      return res.status(500).send("Internal Server Error");
+    }
+    res.send(tasks);
+  });
+};
+
+export const readTaskIndividual = (req, res) => {
+  const user_id = req.user.user_id;
+  const taskId = req.params.taskId;
+  readTaskById(user_id, taskId, (error, tasks) => {
+    if (error) {
+      console.error("Error fetching task:", error);
       return res.status(500).send("Internal Server Error");
     }
     res.send(tasks);
@@ -48,7 +61,7 @@ export const deletetask = (req, res) => {
 };
 
 export const updatetask = (req, res) => {
-  const id = req.body.id;
+  const id = req.params.taskId;
   updateTask(id, req.body, (error) => {
     if (error) {
       console.error("Error updating task in the database:", error);
