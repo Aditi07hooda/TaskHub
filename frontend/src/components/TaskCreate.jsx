@@ -25,7 +25,7 @@ export default function TaskCreate() {
         ? format(selectedDate, "yyyy-MM-dd")
         : null;
 
-      await axios.post(
+      const response = await axios.post(
         "http://localhost:5001/todos",
         {
           title: title,
@@ -40,6 +40,16 @@ export default function TaskCreate() {
         }
       );
 
+      const updatedTaskListResponse = await axios.get(
+        "http://localhost:5001/todos",
+        {
+          withCredentials: true,
+        }
+      );
+
+      const updatedTaskList = updatedTaskListResponse.data || [];
+      setTasks(updatedTaskList);
+
       setTitle("");
       setDescription("");
       setSelectedDate(null);
@@ -50,6 +60,7 @@ export default function TaskCreate() {
       console.log(error);
     }
   };
+
   return (
     <div>
       <section className="bg-white dark:bg-gray-900">
@@ -67,13 +78,14 @@ export default function TaskCreate() {
                   Task Name
                 </label>
                 <input
+                  id="name"
                   type="text"
                   name="name"
-                  id="name"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  placeholder="Type product name"
-                  required=""
+                  placeholder="Type task name"
+                  value={title}
                   onChange={(e) => setTitle(e.target.value)}
+                  required=""
                 />
               </div>
 
@@ -110,6 +122,7 @@ export default function TaskCreate() {
                   rows="8"
                   className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="Your description here"
+                  value={description}
                   onChange={(e) => setDescription(e.target.value)}
                 ></textarea>
               </div>

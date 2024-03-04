@@ -1,6 +1,7 @@
 import express from "express";
 import {
   readevent,
+  readEventIndividual,
   updateevent,
   deleteevent,
   createEvent
@@ -11,10 +12,12 @@ const router = express.Router();
 
 router.get("/event", isAuthenticated, readevent);
 
+router.get("/event/:eventId", isAuthenticated, readEventIndividual);
+
 router.post("/event", isAuthenticated, createEvent);
 
-router.delete("/event", isAuthenticated, deleteevent);
+router.delete("/event/:eventId", isAuthenticated, deleteevent);
 
-router.put("/event", isAuthenticated, updateevent);
+router.put("/event/:eventId", isAuthenticated, updateevent);
 
 export default router;

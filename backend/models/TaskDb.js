@@ -6,7 +6,7 @@ const createTaskTableQuery = `
     user_id INT(4) ZEROFILL,
     title VARCHAR(255) NOT NULL,
     description TEXT,
-    due_date DATE,
+    enddate DATE,
     status ENUM('pending', 'completed') DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -20,7 +20,7 @@ connection.query(createTaskTableQuery, (error, results, fields) => {
   } else {
     console.log("Task table created successfully.");
   }
-});
+})
 
 const pendingTaskdb = connection.query(
   `CREATE TABLE IF NOT EXISTS PendingTask (

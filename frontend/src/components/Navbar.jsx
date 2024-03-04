@@ -6,13 +6,15 @@ import { useNavigate } from "react-router-dom";
 import { isAuthenticatedUser } from "../state/Authentication";
 import { useRecoilState } from "recoil";
 import TaskCreate from "../components/TaskCreate.jsx";
+import EventCreate from "../components/EventCreate.jsx";
 
 const Navbar = () => {
   const [name, setname] = useState("");
   const [email, setEmail] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isAddDropdown, setIsAddDropdown] = useState(false);
-  const [isFormVisible, setFormVisibility] = useState(false);
+  const [isTaskFormVisible, setTaskFormVisibility] = useState(false);
+  const [isEventFormVisible, setEventFormVisibility] = useState(false);
   const [isAuthenticated, setIsAuthenticated] =
     useRecoilState(isAuthenticatedUser);
 
@@ -25,8 +27,11 @@ const Navbar = () => {
     setIsAddDropdown((prev) => !prev);
   };
 
-  const handleToggleForm = () => {
-    setFormVisibility((prev) => !prev);
+  const handleToggleTaskForm = () => {
+    setTaskFormVisibility((prev) => !prev);
+  };
+  const handleToggleEventForm = () => {
+    setEventFormVisibility((prev) => !prev);
   };
 
   const handleSignOut = async () => {
@@ -85,18 +90,21 @@ const Navbar = () => {
                 <div className="py-2">
                   <button
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full"
-                    onClick={handleToggleForm}
+                    onClick={handleToggleTaskForm}
                   >
                     Task
                   </button>
-                  {isFormVisible && (
-                    <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center flex-col" style={{backdropFilter: "blur(15px)"}}>
+                  {isTaskFormVisible && (
+                    <div
+                      className="fixed top-0 left-0 w-full h-full flex items-center justify-center flex-col"
+                      style={{ backdropFilter: "blur(15px)" }}
+                    >
                       <div>
                         <TaskCreate />
                         <button
                           type="submit"
                           className="inline-flex items-center px-5 py-2.5 mt-4 sm:mt-6 text-sm font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800"
-                          onClick={handleToggleForm}
+                          onClick={handleToggleTaskForm}
                         >
                           Close
                         </button>
@@ -105,9 +113,29 @@ const Navbar = () => {
                   )}
                 </div>
                 <div className="py-2">
-                  <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full">
+                  <button
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full"
+                    onClick={handleToggleEventForm}
+                  >
                     Event
                   </button>
+                  {isEventFormVisible && (
+                    <div
+                      className="fixed top-0 left-0 w-full h-full flex items-center justify-center flex-col"
+                      style={{ backdropFilter: "blur(15px)" }}
+                    >
+                      <div>
+                        <EventCreate />
+                        <button
+                          type="submit"
+                          className="inline-flex items-center px-5 py-2.5 mt-4 sm:mt-6 text-sm font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800"
+                          onClick={handleToggleEventForm}
+                        >
+                          Close
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div className="py-2">
                   <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full">

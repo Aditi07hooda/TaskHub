@@ -2,8 +2,10 @@
 
 import React from "react";
 import "../css/Table.css";
+import { format } from "date-fns";
 
-const Table = ({ tasks, onDelete }) => {
+
+const Table = ({ tasks, onDelete, onUpdate }) => {
   return (
     <div className="task-manager-table-container">
       <table className="task-manager-table">
@@ -13,6 +15,7 @@ const Table = ({ tasks, onDelete }) => {
             <th>Task Description</th>
             <th>Deadline</th>
             <th>Status</th>
+            <th>Update</th>
             <th>Delete</th>
           </tr>
         </thead>
@@ -21,8 +24,11 @@ const Table = ({ tasks, onDelete }) => {
             <tr key={task.id}>
               <td>{task.title}</td>
               <td>{task.description}</td>
-              <td>{task.due_date}</td>
+              <td>{format(new Date(task.enddate), "yyyy-MM-dd")}</td>
               <td>{task.status}</td>
+              <td>
+                <button onClick={() => onUpdate(task.id)}>Update</button>
+              </td>
               <td>
                 <button onClick={() => onDelete(task.id)}>Delete</button>
               </td>

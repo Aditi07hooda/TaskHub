@@ -30,7 +30,10 @@ export const createtask = (req, res) => {
 
   const user_id = req.user.user_id;
   insertTask(todoitem, user_id);
-  res.send("New task added");
+  res.status(201).json({
+    message: 'New task added successfully!',
+    task: todoitem,
+  });
 };
 
 export const deletetask = (req, res) => {

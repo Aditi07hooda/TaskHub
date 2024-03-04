@@ -5,6 +5,7 @@ import { Profile } from "./page/Profile";
 import Calendars from "./page/Calendars"
 import { Signup } from "./page/Signup";
 import Login from "./page/Login"
+import EventUpdate from "./components/EventUpdate";
 
 const Routing = () => {
   return (
@@ -15,6 +16,7 @@ const Routing = () => {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/calendar" element={<Calendars />} />
+        <Route path="/updateEvent/:eventId" element={<EventUpdate/>} />
       </Routes>
     </Router>
   );

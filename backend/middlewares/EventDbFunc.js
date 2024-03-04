@@ -1,20 +1,27 @@
+import { connection } from "../config/databaseConnection.js";
 import eventdb from "../models/EventDb.js";
 
-const insertEvent = (eventItem, user_id, callback) => {
-    eventdb.query(
-    "INSERT INTO Event (id, user_id, title, description, location, on_date) VALUES (?, ?, ?, ?, ?)",
-    [eventItem.id, user_id, eventItem.title, eventItem.description, eventItem.location, eventItem.ondate],
+const insertEvent = (eventItem, user_id) => {
+  eventdb.query(
+    "INSERT INTO Event (id, user_id, title, description, location, fromdate, enddate) VALUES (?, ?, ?, ?, ?, ?, ?)",
+    [
+      eventItem.id,
+      user_id,
+      eventItem.title,
+      eventItem.description,
+      eventItem.location,
+      eventItem.fromdate,
+      eventItem.enddate,
+    ],
     (error, results, fields) => {
       if (error) {
         console.error("Error creating Event:", error);
-        callback(error);
       } else {
         console.log("New Event added in db");
       }
     }
   );
 };
-
 
 const deleteEvent = (id, callback) => {
   eventdb.query(
@@ -34,7 +41,7 @@ const deleteEvent = (id, callback) => {
         }
       }
     }
-  )
+  );
 };
 
 const updateEvent = (id, updatedEvent, callback) => {
@@ -73,13 +80,30 @@ const readEvent = (user_id, callback) => {
     [user_id],
     (error, results, fields) => {
       if (error) {
+        console.error("Error reading events:", error);
         callback(error, null);
       } else {
+        console.log("Read events successfully:", results);
         callback(null, results);
       }
     }
   );
 };
 
+const readEventById = (user_id, eventId, callback) => {
+  eventdb.query(
+    "SELECT * FROM Event WHERE user_id = ? AND id = ?",
+    [user_id, eventId],
+    (error, results, fields) => {
+      if (error) {
+        console.error("Error reading events:", error);
+        callback(error, null);
+      } else {
+        console.log("Read events successfully:", results);
+        callback(null, results);
+      }
+    }
+  );
+};
 
-export { insertEvent, deleteEvent, updateEvent, readEvent };
+export { insertEvent, deleteEvent, updateEvent, readEvent, readEventById };

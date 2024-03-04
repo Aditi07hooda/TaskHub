@@ -1,8 +1,8 @@
-import taskdb from "../models/TaskDb.js";
+import taskdb from "../models/TaskDb.js"
 
 const insertTask = (todoitem, user_id) => {
   taskdb.query(
-    "INSERT INTO Task (id, user_id, title, description, due_date) VALUES (?, ?, ?, ?, ?)",
+    "INSERT INTO Task (id, user_id, title, description, enddate) VALUES (?, ?, ?, ?, ?)",
     [todoitem.id, user_id, todoitem.title, todoitem.description, todoitem.enddate],
     (error, results, fields) => {
       if (error) {

@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import "../css/Dashboard.css";
 import { isAuthenticatedUser } from "../state/Authentication";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/sidebar";
 import Piechart from "../components/Piechart";
 import Barchart from "../components/Barchart";
-import Table from "../components/Tables";
+import TaskTable from "../components/TasksTables.jsx";
+import EventTable from "../components/EventsTables.jsx";
 import { CDBCard, CDBCardBody, CDBContainer } from "cdbreact";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useNavigate } from "react-router-dom";
-import { taskList, taskIndividual } from "../state/Task.jsx";
-import axios from "axios";
+import { taskList } from "../state/Task.jsx";
+import { eventList } from "../state/Event.jsx";
 
 export default function Dashboard() {
   const isAuthenticated = useRecoilValue(isAuthenticatedUser);
@@ -22,12 +24,20 @@ export default function Dashboard() {
   }, [isAuthenticated]);
 
   const [tasks, setTasks] = useRecoilState(taskList);
+  const [events, setEvents] = useRecoilState(eventList);
 
-  const handleDelete = async (taskId) => {
+  const handleDeleteTask = async (taskId) => {
     await axios.delete(`http://localhost:5001/todos/${taskId}`, {
       withCredentials: true,
     });
-    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId))
+    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
+  };
+
+  const handleDeleteEvent = async (eventId) => {
+    await axios.delete(`http://localhost:5001/event/${eventId}`, {
+      withCredentials: true,
+    });
+    setEvents((prevEvent) => prevEvent.filter((event) => event.id !== eventId));
   };
 
   return (
@@ -121,10 +131,18 @@ export default function Dashboard() {
 
               {/* table */}
               <div>
-                <Table tasks={tasks} onDelete={handleDelete} className="mx-8" />
+                <TaskTable
+                  tasks={tasks}
+                  onDelete={handleDeleteTask}
+                  className="mx-8"
+                />
               </div>
               <div>
-                <Table tasks={tasks} onDelete={handleDelete} className="mx-8" />
+                <EventTable
+                  events={events}
+                  onDelete={handleDeleteEvent}
+                  className="mx-8"
+                />
               </div>
             </div>
           </div>

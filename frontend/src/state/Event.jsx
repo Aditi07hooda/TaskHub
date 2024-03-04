@@ -1,13 +1,13 @@
 import axios from "axios";
 import { atom, atomFamily, selector } from "recoil";
 
-export const taskList = atom({
-  key: "taskList",
+export const eventList = atom({
+  key: "eventList",
   default: selector({
-    key: "defaultTaskListSelector",
+    key: "defaultEventListSelector",
     get: async ({ get }) => {
       try {
-        const response = await axios.get("http://localhost:5001/todos", {
+        const response = await axios.get("http://localhost:5001/event", {
           withCredentials: true,
         });
         return response.data || [];
@@ -19,18 +19,19 @@ export const taskList = atom({
   }),
 });
 
-export const taskIndividual = atomFamily({
-  key: "taskIndividual",
-  default: (taskId) => selector({
-    key: `taskIndividualSelector-${taskId}`,
+export const eventIndividual = atomFamily({
+  key: "eventIndividual",
+  default: (eventId) => selector({
+    key: `eventIndividualSelector`,
     get: async ({ get }) => {
       try {
-        const response = await axios.get(`http://localhost:5001/todos/${taskId}`, {
+        const response = await axios.get(`http://localhost:5001/event/${eventId}`, {
           withCredentials: true,
         });
+        console.log(response.data)
         return response.data || [];
       } catch (error) {
-        console.error(`Error fetching task with id ${taskId}:`, error);
+        console.error(`Error fetching task with id ${eventId}:`, error);
         throw error;
       }
     },
