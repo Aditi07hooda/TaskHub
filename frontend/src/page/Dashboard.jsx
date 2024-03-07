@@ -8,11 +8,14 @@ import Piechart from "../components/Piechart";
 import Barchart from "../components/Barchart";
 import TaskTable from "../components/TasksTables.jsx";
 import EventTable from "../components/EventsTables.jsx";
+import ProjectsTables from "../components/ProjectsTables.jsx";
 import { CDBCard, CDBCardBody, CDBContainer } from "cdbreact";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useNavigate } from "react-router-dom";
 import { taskList } from "../state/Task.jsx";
 import { eventList } from "../state/Event.jsx";
+import { projectList, projectListDetailedView } from "../state/Project.jsx";
+import { eventCount, projectCount, taskCount } from "../state/Count.jsx";
 
 export default function Dashboard() {
   const isAuthenticated = useRecoilValue(isAuthenticatedUser);
@@ -25,6 +28,14 @@ export default function Dashboard() {
 
   const [tasks, setTasks] = useRecoilState(taskList);
   const [events, setEvents] = useRecoilState(eventList);
+  const [projects, setProjects] = useRecoilState(projectList);
+  const [projectDetailed, setprojectDetailed] = useRecoilState(
+    projectListDetailedView
+  );
+
+  const eventNo = useRecoilValue(eventCount)
+  const projectNo = useRecoilValue(projectCount)
+  const taskNo = useRecoilValue(taskCount)
 
   const handleDeleteTask = async (taskId) => {
     await axios.delete(`http://localhost:5001/todos/${taskId}`, {
@@ -38,6 +49,21 @@ export default function Dashboard() {
       withCredentials: true,
     });
     setEvents((prevEvent) => prevEvent.filter((event) => event.id !== eventId));
+  };
+  const handleDeleteProject = async (projectId) => {
+    await axios.delete(`http://localhost:5001/Project/${projectId}`, {
+      withCredentials: true,
+    });
+    setProjects((preProject) =>
+      preProject.filter((project) => project.id !== projectId)
+    );
+    const updatedEventListResponse = await axios.get(
+      "http://localhost:5001/ProjectDetailedView",
+      {
+        withCredentials: true,
+      }
+    );
+    setprojectDetailed(updatedEventListResponse.data)
   };
 
   return (
@@ -64,7 +90,7 @@ export default function Dashboard() {
             <div className="main-content">
               {/* chart */}
               <div className="pie-bar grid grid-cols-2 m-5 gap-16">
-                <Piechart />
+                <Piechart eventNo={eventNo} taskNo={taskNo} projectNo={projectNo}/>
                 <Barchart />
               </div>
 
@@ -82,9 +108,9 @@ export default function Dashboard() {
                     <CDBCard
                       style={{ paddingLeft: "1.5rem", paddingTop: "0.5rem" }}
                     >
-                      <b style={{ fontSize: "1.5rem" }}>5</b>
+                      <b style={{ fontSize: "1.5rem" }}>{taskNo.taskNo}</b>
                       <p style={{ color: "gray" }}>
-                        <b>Pending Task</b>
+                        <b>Task</b>
                       </p>
                     </CDBCard>
                   </CDBCardBody>
@@ -101,9 +127,9 @@ export default function Dashboard() {
                     <CDBCard
                       style={{ paddingLeft: "1.5rem", paddingTop: "0.5rem" }}
                     >
-                      <b style={{ fontSize: "1.5rem" }}>2</b>
+                      <b style={{ fontSize: "1.5rem" }}>{eventNo.eventNo}</b>
                       <p style={{ color: "gray" }}>
-                        <b>In Progress</b>
+                        <b>Events</b>
                       </p>
                     </CDBCard>
                   </CDBCardBody>
@@ -120,9 +146,9 @@ export default function Dashboard() {
                     <CDBCard
                       style={{ paddingLeft: "1.5rem", paddingTop: "0.5rem" }}
                     >
-                      <b style={{ fontSize: "1.5rem" }}>10</b>
+                      <b style={{ fontSize: "1.5rem" }}>{projectNo.projectNo}</b>
                       <p style={{ color: "gray" }}>
-                        <b>Total Task</b>
+                        <b>Projects</b>
                       </p>
                     </CDBCard>
                   </CDBCardBody>
@@ -141,6 +167,13 @@ export default function Dashboard() {
                 <EventTable
                   events={events}
                   onDelete={handleDeleteEvent}
+                  className="mx-8"
+                />
+              </div>
+              <div>
+                <ProjectsTables
+                  projects={projectDetailed}
+                  onDelete={handleDeleteProject}
                   className="mx-8"
                 />
               </div>

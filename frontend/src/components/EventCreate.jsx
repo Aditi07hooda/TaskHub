@@ -31,7 +31,7 @@ export default function TaskCreate() {
         : null;
       const formattedEndDate = endSelectedDate
         ? format(endSelectedDate, "yyyy-MM-dd")
-        : null;
+        : null
 
       const response = await axios.post(
         "http://localhost:5001/event",

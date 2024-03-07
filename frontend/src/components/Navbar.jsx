@@ -7,6 +7,7 @@ import { isAuthenticatedUser } from "../state/Authentication";
 import { useRecoilState } from "recoil";
 import TaskCreate from "../components/TaskCreate.jsx";
 import EventCreate from "../components/EventCreate.jsx";
+import ProjectCreate from "../components/ProjectCreate.jsx";
 
 const Navbar = () => {
   const [name, setname] = useState("");
@@ -15,6 +16,7 @@ const Navbar = () => {
   const [isAddDropdown, setIsAddDropdown] = useState(false);
   const [isTaskFormVisible, setTaskFormVisibility] = useState(false);
   const [isEventFormVisible, setEventFormVisibility] = useState(false);
+  const [isProjectFormVisible, setProjectFormVisibility] = useState(false);
   const [isAuthenticated, setIsAuthenticated] =
     useRecoilState(isAuthenticatedUser);
 
@@ -32,6 +34,9 @@ const Navbar = () => {
   };
   const handleToggleEventForm = () => {
     setEventFormVisibility((prev) => !prev);
+  };
+  const handleToggleProjectForm = () => {
+    setProjectFormVisibility((prev) => !prev);
   };
 
   const handleSignOut = async () => {
@@ -138,9 +143,29 @@ const Navbar = () => {
                   )}
                 </div>
                 <div className="py-2">
-                  <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full">
+                  <button
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full"
+                    onClick={handleToggleProjectForm}
+                  >
                     Project
                   </button>
+                  {isProjectFormVisible && (
+                    <div
+                      className="fixed top-0 left-0 w-full h-full flex items-center justify-center flex-col"
+                      style={{ backdropFilter: "blur(15px)" }}
+                    >
+                      <div>
+                        <ProjectCreate />
+                        <button
+                          type="submit"
+                          className="inline-flex items-center px-5 py-2.5 mt-4 sm:mt-6 text-sm font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800"
+                          onClick={handleToggleProjectForm}
+                        >
+                          Close
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}

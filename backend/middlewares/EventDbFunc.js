@@ -1,4 +1,3 @@
-import { connection } from "../config/databaseConnection.js";
 import eventdb from "../models/EventDb.js";
 
 const insertEvent = (eventItem, user_id) => {

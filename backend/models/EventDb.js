@@ -22,4 +22,4 @@ connection.query(eventdb, (error, results, fields) => {
   }
 });
 
-export default connection
+export default connection;

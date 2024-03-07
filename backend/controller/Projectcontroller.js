@@ -29,18 +29,19 @@ const createProjectWithDetails = async (req, res) => {
       // Function to get user_id from user_name
       const getUserIdFromUserName = async (userName) => {
         return new Promise((resolve, reject) => {
-          connection.query(
-            "SELECT user_id FROM Users WHERE user_name = ?",
-            [userName],
-            (error, results, fields) => {
-              if (error) {
-                reject(error);
-              } else {
-                const user = results[0];
-                resolve(user ? user.user_id : null);
-              }
+          const query = "SELECT user_id FROM Users WHERE user_name = ?";
+          console.log("Query:", query, "Parameters:", [userName]);
+
+          connection.query(query, [userName], (error, results, fields) => {
+            if (error) {
+              console.error("Error executing query:", error);
+              reject(error);
+            } else {
+              const user = results[0];
+              console.log("Query results:", results);
+              resolve(user ? user.user_id : null);
             }
-          );
+          });
         });
       };
 
@@ -49,7 +50,7 @@ const createProjectWithDetails = async (req, res) => {
       const teamMemberIds = [
         teamLeaderId,
         ...(await Promise.all(
-          team_members.map((memberName) => getUserIdFromUserName(memberName))
+          team_members.map((member) => getUserIdFromUserName(member.name))
         )),
       ];
 
@@ -92,4 +93,164 @@ const createProjectWithDetails = async (req, res) => {
   );
 };
 
-export { createProjectWithDetails };
+// Get all projects
+const getAllProjects = (req, res) => {
+  const getAllProjectsQuery = `
+    SELECT * FROM Projects
+  `;
+
+  connection.query(getAllProjectsQuery, (error, results, fields) => {
+    if (error) {
+      console.error("Error getting projects:", error);
+      return res.status(500).send("Internal Server Error");
+    }
+
+    res.status(200).json(results);
+  });
+};
+const getAllProjectsDetailedView = (req, res) => {
+  const getProjectDetailsView = `
+    SELECT * FROM ProjectDetailsView
+  `;
+
+  connection.query(getProjectDetailsView, (error, results, fields) => {
+    if (error) {
+      console.error("Error getting projects:", error);
+      return res.status(500).send("Internal Server Error");
+    }
+
+    res.status(200).json(results);
+  });
+};
+
+// Get a specific project by ID
+const getProjectById = (req, res) => {
+  const projectId = req.params.projectId;
+  const getProjectByIdQuery = `
+    SELECT * FROM ProjectDetailsView WHERE project_id = ?
+  `;
+
+  connection.query(
+    getProjectByIdQuery,
+    [projectId],
+    (error, results, fields) => {
+      if (error) {
+        console.error("Error getting project by ID:", error);
+        return res.status(500).send("Internal Server Error");
+      }
+
+      if (results.length === 0) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+
+      res.status(200).json(results[0]);
+    }
+  );
+};
+
+// Update a specific project by ID
+const updateProjectById = (req, res) => {
+  const projectId = req.params.projectId;
+  const { name, due_date } = req.body;
+  const updateProjectByIdQuery = `
+    UPDATE Projects SET name = ?, due_date = ? WHERE project_id = ?
+  `;
+
+  connection.query(
+    updateProjectByIdQuery,
+    [name, due_date, projectId],
+    (error, results, fields) => {
+      if (error) {
+        console.error("Error updating project by ID:", error);
+        return res.status(500).send("Internal Server Error");
+      }
+
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+
+      res.status(200).json({ message: "Project updated successfully" });
+    }
+  );
+};
+
+// Delete a specific project by ID
+const deleteProjectById = (req, res) => {
+  const projectId = req.params.projectId;
+  const deleteProjectByIdQuery = `
+    DELETE FROM Projects WHERE project_id = ?
+  `;
+
+  connection.query(
+    deleteProjectByIdQuery,
+    [projectId],
+    (error, results, fields) => {
+      if (error) {
+        console.error("Error deleting project by ID:", error);
+        return res.status(500).send("Internal Server Error");
+      }
+
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+
+      res.status(200).json({ message: "Project deleted successfully" });
+    }
+  );
+};
+
+const projectCount = (req, res) => {
+  const projectcount = `
+  SELECT COUNT(*) as project_count from ProjectDetailsView
+  `;
+
+  connection.query(projectcount, (error, results, fields) => {
+    if (error) {
+      console.error("Error getting total project: ", error);
+      return res.status(500).send("Internal Server Error");
+    }
+
+    res.status(200).json({ projectNo: `${results[0].project_count}` });
+  });
+};
+
+const eventCount = (req, res) => {
+  const eventcount = `
+  SELECT COUNT(*) as event_count from Event
+  `;
+
+  connection.query(eventcount, (error, results, fields) => {
+    if (error) {
+      console.error("Error getting total event: ", error);
+      return res.status(500).send("Internal Server Error");
+    }
+
+    res.status(200).json({ eventNo: `${results[0].event_count}` });
+  });
+};
+const taskCount = (req, res) => {
+  const taskcount = `
+  SELECT COUNT(*) as task_count from Task
+  `;
+
+  connection.query(taskcount, (error, results, fields) => {
+    if (error) {
+      console.error("Error getting total task: ", error);
+      return res.status(500).send("Internal Server Error");
+    }
+
+    res.status(200).json({ taskNo: `${results[0].task_count}` });
+  });
+};
+
+export {
+  createProjectWithDetails,
+  getAllProjects,
+  getProjectById,
+  updateProjectById,
+  deleteProjectById,
+  getAllProjectsDetailedView,
+  projectCount,
+  eventCount,
+  taskCount,
+};
