@@ -2,11 +2,10 @@ import { PieChart, Pie, Cell } from "recharts";
 import React, {useState, useEffect} from "react";
 import "../css/Piechart.css"
 export default function Piechart({eventNo, projectNo, taskNo}) {
-  console.log(eventNo.eventNo, projectNo.projectNo, taskNo.taskNo)
   const data = [
-    { name: "Events", students: eventNo.eventNo },
-    { name: "Task", students: projectNo.projectNo },
-    { name: "Projects", students: taskNo.taskNo },
+    { name: "Events", students: eventNo.eventNo*100 },
+    { name: "Task", students: projectNo.projectNo*100 },
+    { name: "Projects", students: taskNo.taskNo*100 },
   ];
   const colors = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 

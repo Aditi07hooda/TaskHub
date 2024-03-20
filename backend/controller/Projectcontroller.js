@@ -18,7 +18,7 @@ const createProjectWithDetails = async (req, res) => {
         return res.status(500).send("Internal Server Error");
       }
 
-      const projectId = results.insertId;
+      const projectId = results.insertId
 
       // Step 2: Insert team members into the ProjectMembers table
       const createProjectMembersQuery = `
@@ -95,6 +95,7 @@ const createProjectWithDetails = async (req, res) => {
 
 // Get all projects
 const getAllProjects = (req, res) => {
+  const user_id = req.user.user_id;
   const getAllProjectsQuery = `
     SELECT * FROM Projects
   `;
@@ -108,12 +109,13 @@ const getAllProjects = (req, res) => {
     res.status(200).json(results);
   });
 };
-const getAllProjectsDetailedView = (req, res) => {
-  const getProjectDetailsView = `
-    SELECT * FROM ProjectDetailsView
-  `;
 
-  connection.query(getProjectDetailsView, (error, results, fields) => {
+const getAllProjectsDetailedView = (req, res) => {
+  const user_id = req.user.user_id.toString();
+  const getAllProjectsQuery = `
+    SELECT * FROM ProjectDetailsView WHERE FIND_IN_SET(CAST(LPAD('${user_id}', 4, '0') AS CHAR), team_member_ids) > 0
+  `;
+  connection.query(getAllProjectsQuery, (error, results, fields) => {
     if (error) {
       console.error("Error getting projects:", error);
       return res.status(500).send("Internal Server Error");
@@ -200,8 +202,9 @@ const deleteProjectById = (req, res) => {
 };
 
 const projectCount = (req, res) => {
+  const user_id = req.user.user_id.toString();
   const projectcount = `
-  SELECT COUNT(*) as project_count from ProjectDetailsView
+    SELECT COUNT(*) as project_count FROM ProjectDetailsView WHERE FIND_IN_SET(CAST(LPAD('${user_id}', 4, '0') AS CHAR), team_member_ids) > 0
   `;
 
   connection.query(projectcount, (error, results, fields) => {
@@ -215,11 +218,12 @@ const projectCount = (req, res) => {
 };
 
 const eventCount = (req, res) => {
+  const user_id = req.user.user_id;
   const eventcount = `
-  SELECT COUNT(*) as event_count from Event
+  SELECT COUNT(*) as event_count from Event WHERE user_id = ?
   `;
 
-  connection.query(eventcount, (error, results, fields) => {
+  connection.query(eventcount, [user_id], (error, results, fields) => {
     if (error) {
       console.error("Error getting total event: ", error);
       return res.status(500).send("Internal Server Error");
@@ -229,11 +233,12 @@ const eventCount = (req, res) => {
   });
 };
 const taskCount = (req, res) => {
+  const user_id = req.user.user_id;
   const taskcount = `
-  SELECT COUNT(*) as task_count from Task
+  SELECT COUNT(*) as task_count from Task WHERE user_id = ?
   `;
 
-  connection.query(taskcount, (error, results, fields) => {
+  connection.query(taskcount, [user_id], (error, results, fields) => {
     if (error) {
       console.error("Error getting total task: ", error);
       return res.status(500).send("Internal Server Error");

@@ -5,8 +5,9 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import { format } from "date-fns";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import { eventList } from "../state/Event";
+import { eventCount } from "../state/Count";
 
 export default function TaskCreate() {
   const [fromSelectedDate, setFromSelectedDate] = useState(null);
@@ -15,6 +16,9 @@ export default function TaskCreate() {
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
   const [events, setEvents] = useRecoilState(eventList);
+
+  const setEventNo = useSetRecoilState(eventCount)
+ 
 
   const handleFromDateChange = (date) => {
     setFromSelectedDate(date);
@@ -59,7 +63,8 @@ export default function TaskCreate() {
 
       const updatedEventList = updatedEventListResponse.data || [];
       setEvents(updatedEventList);
-
+      setEventNo(() => ({eventNo: updatedEventList.length}))
+      
       setTitle("");
       setDescription("");
       setLocation("");

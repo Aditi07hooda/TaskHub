@@ -7,6 +7,7 @@ import axios from "axios";
 import { format } from "date-fns";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { projectListDetailedView } from "../state/Project.jsx";
+import { projectCount } from "../state/Count.jsx";
 
 export default function TaskCreate() {
   const [selectedDate, setSelectedDate] = useState(null);
@@ -17,6 +18,7 @@ export default function TaskCreate() {
     { title: "", description: "", due_date: "" },
   ]);
   const setProjectView = useSetRecoilState(projectListDetailedView)
+  const setProjectNo = useSetRecoilState(projectCount)
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
@@ -79,13 +81,14 @@ export default function TaskCreate() {
         }
       );
 
-      const updatedEventListResponse = await axios.get(
+      const updatedProjectListResponse = await axios.get(
         "http://localhost:5001/ProjectDetailedView",
         {
           withCredentials: true,
         }
       );
-      setProjectView(updatedEventListResponse.data)
+      setProjectView(updatedProjectListResponse.data)
+      setProjectNo(() => ({projectNo: updatedProjectListResponse.data.length}))
 
       setName("");
       setTeamLeaderName("");

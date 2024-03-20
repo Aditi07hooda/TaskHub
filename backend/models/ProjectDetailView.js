@@ -9,6 +9,7 @@ export const projectDetailedView = connection.query(
       Projects.name,
       Projects.due_date,
       Users_team_leader.user_name AS team_leader_name,
+      GROUP_CONCAT(Users_team_members.user_id) AS team_member_ids,
       GROUP_CONCAT(Users_team_members.user_name) AS team_members,
       CONCAT('[', GROUP_CONCAT(
           CONCAT('{"member_name": "', Users_team_members.user_name, '", "tasks": [',
@@ -39,14 +40,14 @@ export const projectDetailedView = connection.query(
   ) AS user_tasks ON Projects.project_id = user_tasks.project_id AND Users_team_members.user_name = user_tasks.user_name
   GROUP BY
       Projects.project_id;
+
   
   `,
   (error, results, fields) => {
     if (error) {
-      console.error("Error creating ProjectDetailsView:", error);
+      console.error("Error creating ProjectDetailsView:", error.message);
     } else {
       console.log("ProjectDetailsView created successfully.");
     }
-    
   }
 );

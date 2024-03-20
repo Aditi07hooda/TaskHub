@@ -11,7 +11,7 @@ const todolist = [];
 const pendingtodolist = [];
 
 export const readtask = (req, res) => {
-  const user_id = req.user.user_id;
+  const user_id = req.user.user_id
   readTask(user_id, (error, tasks) => {
     if (error) {
       console.error("Error fetching tasks:", error);
@@ -41,7 +41,7 @@ export const createtask = (req, res) => {
     enddate: req.body.enddate,
   };
 
-  const user_id = req.user.user_id;
+  const user_id = req.user.user_id
   insertTask(todoitem, user_id);
   res.status(201).json({
     message: 'New task added successfully!',

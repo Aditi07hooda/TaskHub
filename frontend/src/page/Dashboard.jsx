@@ -33,15 +33,16 @@ export default function Dashboard() {
     projectListDetailedView
   );
 
-  const eventNo = useRecoilValue(eventCount)
-  const projectNo = useRecoilValue(projectCount)
-  const taskNo = useRecoilValue(taskCount)
+  const [eventNo, setEventNo] = useRecoilState(eventCount);
+  const [projectNo, setProjectNo] = useRecoilState(projectCount);
+  const [taskNo, setTaskNo] = useRecoilState(taskCount);
 
   const handleDeleteTask = async (taskId) => {
     await axios.delete(`http://localhost:5001/todos/${taskId}`, {
       withCredentials: true,
     });
     setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
+    setTaskNo((prevTask) => ({ taskNo: prevTask.taskNo - 1 }));
   };
 
   const handleDeleteEvent = async (eventId) => {
@@ -49,6 +50,7 @@ export default function Dashboard() {
       withCredentials: true,
     });
     setEvents((prevEvent) => prevEvent.filter((event) => event.id !== eventId));
+    setEventNo((prevEvent) => ({ eventNo: prevEvent.eventNo - 1 }));
   };
   const handleDeleteProject = async (projectId) => {
     await axios.delete(`http://localhost:5001/Project/${projectId}`, {
@@ -63,7 +65,8 @@ export default function Dashboard() {
         withCredentials: true,
       }
     );
-    setprojectDetailed(updatedEventListResponse.data)
+    setprojectDetailed(updatedEventListResponse.data);
+    setProjectNo((prevProject) => ({projectNo: prevProject.projectNo - 1}))
   };
 
   return (
@@ -90,8 +93,16 @@ export default function Dashboard() {
             <div className="main-content">
               {/* chart */}
               <div className="pie-bar grid grid-cols-2 m-5 gap-16">
-                <Piechart eventNo={eventNo} taskNo={taskNo} projectNo={projectNo}/>
-                <Barchart />
+                <Piechart
+                  eventNo={eventNo}
+                  taskNo={taskNo}
+                  projectNo={projectNo}
+                />
+                <Barchart
+                  eventNo={eventNo}
+                  taskNo={taskNo}
+                  projectNo={projectNo}
+                />
               </div>
 
               {/* card */}
@@ -146,7 +157,9 @@ export default function Dashboard() {
                     <CDBCard
                       style={{ paddingLeft: "1.5rem", paddingTop: "0.5rem" }}
                     >
-                      <b style={{ fontSize: "1.5rem" }}>{projectNo.projectNo}</b>
+                      <b style={{ fontSize: "1.5rem" }}>
+                        {projectNo.projectNo}
+                      </b>
                       <p style={{ color: "gray" }}>
                         <b>Projects</b>
                       </p>
