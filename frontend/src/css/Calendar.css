@@ -19,19 +19,3 @@
 	overflow-y: scroll;
 	overflow-x: auto;
   }
-
-  .react-calendar-left {
-    width: 250px !important;
-    height: 300px !important;
-    margin: 2%;
-  }
-
-  .react-calendar-right{
-    width: 800px !important;
-    height: 600px !important;
-    margin: 2%;
-  }
-
-  .react-calendar-right{
-    height: 500px;
-  }

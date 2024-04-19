@@ -43,8 +43,7 @@ export const isAuthenticated = async (req, res, next) => {
       }
     );
   } catch (error) {
-    console.error('Authentication Error:', error);
-    res.status(401).send('Authentication failed');
+    return res.status(401).send('Authentication failed');
   }
 };
 

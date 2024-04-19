@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/sidebar";
 import Calendar from "react-calendar";
@@ -7,16 +7,39 @@ import "../css/Calendar.css";
 import { useRecoilValue } from "recoil";
 import { useNavigate } from "react-router-dom";
 import { isAuthenticatedUser } from "../state/Authentication";
+import axios from "axios";
 
 export default function Calendars() {
   const isAuthenticated = useRecoilValue(isAuthenticatedUser);
   const navigate = useNavigate();
+  const [taskDate, setTaskDate] = useState([]);
+  const [taskIndividualData, setTaskIndividualData] = useState(null);
   useEffect(() => {
     if (!isAuthenticated) {
       navigate("/");
     }
   }, [isAuthenticated]);
 
+  useEffect(() => {
+    const calendarDate = async () => {
+      const calendarsDate = await axios.get("http://localhost:5001/todos", {
+        withCredentials: true,
+      });
+      setTaskDate(calendarsDate.data);
+    };
+    calendarDate();
+  }, []);
+
+  const handleShowData = async (taskId) => {
+    const taskIndividualDetail = await axios.get(
+      `http://localhost:5001/todos/${taskId}`,
+      {
+        withCredentials: true,
+      }
+    );
+    console.log(taskIndividualDetail.data);
+    setTaskIndividualData(taskIndividualDetail.data);
+  };
   return (
     <>
       {isAuthenticated ? (
@@ -38,10 +61,39 @@ export default function Calendars() {
             <Navbar className="navbar" />
 
             {/* main content */}
-            <div className="main-content">
-              <div className="flex">
-                <Calendar className="react-calendar-left" />
-                <Calendar className="react-calendar-right" />
+            <div className="main-content overflow-scroll">
+              <div className="md:grid md:grid-flow-col">
+                <Calendar className="shadow-md rounded-md md:col-span-1 m-2 md:h-[300px] md:m-[8%]" />
+                <Calendar
+                  className="shadow-md rounded-md m-2 md:w-[800px] md:col-span-2 lg:h-[600px] md:m-[2%]"
+                  tileContent={({ date }) => {
+                    const formattedDate = date.toISOString().split("T")[0];
+                    const tasksForDate = taskDate.filter(
+                      (task) => task.enddate.split("T")[0] === formattedDate
+                    );
+                    return tasksForDate.map((task) => (
+                      <div
+                        key={task.id}
+                        className="text-bg-info"
+                        onClick={() => handleShowData(task.id)}
+                      >
+                        {task.title}
+                      </div>
+                    ));
+                  }}
+                />
+                <div className="bg-white shadow-md p-4 rounded-md m-10 md:col-span-1">
+                  {taskIndividualData && (
+                    <div>
+                      <h3 className="text-lg font-semibold mb-2">
+                        {taskIndividualData[0].title}
+                      </h3>
+                      <p className="text-gray-700">
+                        {taskIndividualData[0].description}
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
