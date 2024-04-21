@@ -12,8 +12,25 @@ import axios from "axios";
 export default function Calendars() {
   const isAuthenticated = useRecoilValue(isAuthenticatedUser);
   const navigate = useNavigate();
+
   const [taskDate, setTaskDate] = useState([]);
+  const [projectDate, setProjectDate] = useState([]);
+  const [eventDate, setEventDate] = useState([]);
   const [taskIndividualData, setTaskIndividualData] = useState(null);
+  const [eventIndividualData, setEventIndividualData] = useState(null);
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const month = date.getMonth() + 1; // Months are zero-indexed
+    const year = date.getFullYear();
+    // Pad single digit values with leading zero
+    const formattedDay = day < 10 ? `0${day}` : day;
+    const formattedMonth = month < 10 ? `0${month}` : month;
+    // Constructing the formatted date string
+    return `${year}-${formattedMonth}-${formattedDay}`;
+  };
+
   useEffect(() => {
     if (!isAuthenticated) {
       navigate("/");
@@ -30,6 +47,26 @@ export default function Calendars() {
     calendarDate();
   }, []);
 
+  useEffect(() => {
+    const calendarProjectDate = async () => {
+      const calendarsProjectDate = await axios.get("http://localhost:5001/Project", {
+        withCredentials: true,
+      });
+      setProjectDate(calendarsProjectDate.data);
+    };
+    calendarProjectDate();
+  }, []);
+
+  useEffect(() => {
+    const calendarEventDate = async () => {
+      const calendarsEventDate = await axios.get("http://localhost:5001/event", {
+        withCredentials: true,
+      });
+      setEventDate(calendarsEventDate.data);
+    };
+    calendarEventDate();
+  }, []);
+
   const handleShowData = async (taskId) => {
     const taskIndividualDetail = await axios.get(
       `http://localhost:5001/todos/${taskId}`,
@@ -37,8 +74,16 @@ export default function Calendars() {
         withCredentials: true,
       }
     );
-    console.log(taskIndividualDetail.data);
     setTaskIndividualData(taskIndividualDetail.data);
+  };
+  const handleShowEventData = async (eventId) => {
+    const eventIndividualDetail = await axios.get(
+      `http://localhost:5001/event/${eventId}`,
+      {
+        withCredentials: true,
+      }
+    );
+    setEventIndividualData(eventIndividualDetail.data);
   };
   return (
     <>
@@ -61,11 +106,41 @@ export default function Calendars() {
             <Navbar className="navbar" />
 
             {/* main content */}
-            <div className="main-content overflow-scroll">
-              <div className="md:grid md:grid-flow-col">
-                <Calendar className="shadow-md rounded-md md:col-span-1 m-2 md:h-[300px] md:m-[8%]" />
-                <Calendar
-                  className="shadow-md rounded-md m-2 md:w-[800px] md:col-span-2 lg:h-[600px] md:m-[2%]"
+            <div className="main-content overflow-scroll md:content-evenly">
+              <div className="md:grid md:grid-flow-col md:mx-24">
+                <Calendar className="shadow-md rounded-md sm:m-2 md:h-[360px] md:!w-[850px] md:m-10" tileContent={({ date }) => {
+                    const formattedDate = date.toISOString().split("T")[0];
+                    const tasksForDate = taskDate.filter(
+                      (task) => task.enddate.split("T")[0] === formattedDate
+                    );
+                    const eventsForDate = eventDate.filter(
+                      (event) => event.enddate.split("T")[0] === formattedDate
+                    );
+                    return (
+                      <>
+                        {tasksForDate.map((task) => (
+                          <div
+                            key={task.id}
+                            className="text-green-300"
+                            onClick={() => handleShowData(task.id)}
+                          >
+                            {task.title}
+                          </div>
+                        ))}
+                        {eventsForDate.map((event) => (
+                          <div
+                            key={event.id}
+                            className="text-yellow-300"
+                            onClick={() => handleShowEventData(event.id)}
+                          >
+                            {event.title}
+                          </div>
+                        ))}
+                      </>
+                    );
+                  }} />
+                {/* <Calendar
+                  className="shadow-md rounded-md md:!w-[850px] lg:h-[600px] md:mt-10"
                   tileContent={({ date }) => {
                     const formattedDate = date.toISOString().split("T")[0];
                     const tasksForDate = taskDate.filter(
@@ -81,15 +156,41 @@ export default function Calendars() {
                       </div>
                     ));
                   }}
-                />
-                <div className="bg-white shadow-md p-4 rounded-md m-10 md:col-span-1">
+                /> */}
+                <div className="bg-white shadow-md p-4 rounded-md m-10 md:!w-84 border-black border-1">
+                  <h4 className="text-md-center font-semibold underline">Details</h4>
                   {taskIndividualData && (
-                    <div>
-                      <h3 className="text-lg font-semibold mb-2">
+                    <div className="mt-5">
+                      <h5 className="font-semibold underline">Task</h5>
+                      <h3 className="text-xl font-semibold mb-2 md:mt-6">
                         {taskIndividualData[0].title}
                       </h3>
                       <p className="text-gray-700">
                         {taskIndividualData[0].description}
+                      </p>
+                      <p style={{ color: taskIndividualData[0].status === 'pending' ? 'red' : 'green' }}>
+                        {taskIndividualData[0].status}
+                      </p>
+                      <p className="text-gray-700">
+                        <b>Last Date:</b> {formatDate(taskIndividualData[0].enddate)}
+                      </p>
+                    </div>
+                  )}
+                  {eventIndividualData && (
+                    <div className="mt-5">
+                      <h5 className="font-semibold underline">Event</h5>
+                      <h3 className="text-xl font-semibold mb-2 md:mt-6">
+                        {eventIndividualData[0].title}
+                      </h3>
+                      <p className="text-gray-700">
+                        {eventIndividualData[0].description}
+                      </p>
+                      <p className="text-gray-700">
+                        {eventIndividualData[0].location}
+                      </p>
+                      <p className="text-gray-700">
+                        <b>From Date:</b> {formatDate(eventIndividualData[0].fromdate)}<br/>
+                        <b>Last Date:</b> {formatDate(eventIndividualData[0].enddate)}
                       </p>
                     </div>
                   )}
