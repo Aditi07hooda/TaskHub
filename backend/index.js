@@ -22,7 +22,7 @@ if (process.env.NODE_ENV !== "PRODUCTION") {
 
 app.use(
   cors({
-    
+    origin: 'https://task-mx8s6xjlg-aditis-projects-96e21552.vercel.app',
     methods: ["GET", "POST", "DELETE", "PUT"],
     credentials: true,
     allowedHeaders: [
