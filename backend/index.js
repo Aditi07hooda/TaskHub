@@ -22,7 +22,7 @@ if (process.env.NODE_ENV !== "PRODUCTION") {
 
 app.use(
   cors({
-    origin: 'http://localhost:5173',
+    
     methods: ["GET", "POST", "DELETE", "PUT"],
     credentials: true,
     allowedHeaders: [
