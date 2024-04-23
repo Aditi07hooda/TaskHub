@@ -1,13 +1,16 @@
 // TaskManagerTable.js
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../css/Table.css";
 import { format } from "date-fns";
 import TaskUpdate from "./TaskUpdate.jsx";
+import { ToastContainer, toast } from "react-toastify";
+import axios from "axios";
 
-const Table = ({ tasks, onDelete, onUpdate }) => {
+const Table = ({ tasks, onDelete, onUpdate}) => {
   const [showTaskUpdate, setShowTaskUpdate] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
+  const [checkedTasks, setCheckedTasks] = useState({});
 
   const handleUpdateClick = (eventId) => {
     setSelectedTaskId(eventId);
@@ -18,6 +21,95 @@ const Table = ({ tasks, onDelete, onUpdate }) => {
     setShowTaskUpdate(false);
     setSelectedTaskId(null);
   };
+
+  useEffect(() => {
+    const fetchTaskStatuses = async () => {
+      try {
+        const taskStatuses = await Promise.all(
+          tasks.map(async (task) => {
+            const taskId = task.id; // Destructure taskId from task object
+            const response = await axios.get(
+              `http://localhost:5001/todos/${taskId}`,
+              {
+                withCredentials: true,
+              }
+            );
+            // console.log(response.data[0].status);
+            return { [taskId]: response.data[0].status };
+          })
+        );
+        const initialStatuses = Object.assign({}, ...taskStatuses);
+        // console.log(initialStatuses)
+        setCheckedTasks(initialStatuses);
+      } catch (error) {
+        console.error("Error fetching task statuses:", error);
+      }
+    };
+
+    fetchTaskStatuses();
+  }, [tasks]);
+
+  const handleCheckboxTaskChange = async (taskId) => {
+    try {
+      const currentStatus = checkedTasks[taskId]; // Get the current status
+      if(currentStatus == "completed"){
+        const confirmation =  confirm("Are you sure you want to change status to pending")
+        if(!confirmation){
+          return toast.info("Okk")
+        }
+        else{
+          const newStatus = currentStatus === "pending" ? "completed" : "pending"; // Toggle between "pending" and "completed"
+      
+          // Update task status in the database
+          await axios.put(
+            `http://localhost:5001/todos/individual/${taskId}`,
+            { status: newStatus },
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+              withCredentials: true,
+            }
+          );
+      
+          // Update local state after successful update
+          setCheckedTasks((prevCheckedTasks) => ({
+            ...prevCheckedTasks,
+            [taskId]: newStatus,
+          }));
+          toast.success("Event updated successfully!", {
+            autoClose: 2000,
+          });
+        }
+      }else{
+
+        const newStatus = currentStatus === "pending" ? "completed" : "pending"; // Toggle between "pending" and "completed"
+      
+          // Update task status in the database
+          await axios.put(
+            `http://localhost:5001/todos/individual/${taskId}`,
+            { status: newStatus },
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+              withCredentials: true,
+            }
+          );
+      
+          // Update local state after successful update
+          setCheckedTasks((prevCheckedTasks) => ({
+            ...prevCheckedTasks,
+            [taskId]: newStatus,
+          }));
+          toast.success("Task updated successfully!", {
+            autoClose: 2000,
+          });
+      }
+    } catch (error) {
+      console.error("Error updating task status:", error);
+    }
+  }; 
 
   return (
     <div className="task-manager-table-container">
@@ -38,7 +130,18 @@ const Table = ({ tasks, onDelete, onUpdate }) => {
               <td>{task.title}</td>
               <td>{task.description}</td>
               <td>{format(new Date(task.enddate), "yyyy-MM-dd")}</td>
-              <td>{task.status}</td>
+              <td>
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={checkedTasks[task.id] === "completed" ? "completed" : ""}
+                    onChange={() => handleCheckboxTaskChange(task.id)}
+                  />
+                  <span className="ml-2">
+                    {checkedTasks[task.id]}
+                  </span>
+                </label>
+              </td>
               <td>
                 <button onClick={() => handleUpdateClick(task.id)}>
                   Update
@@ -69,6 +172,7 @@ const Table = ({ tasks, onDelete, onUpdate }) => {
           ))}
         </tbody>
       </table>
+      <ToastContainer/>
     </div>
   );
 };

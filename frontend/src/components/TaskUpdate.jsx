@@ -10,7 +10,6 @@ import { taskList } from "../state/Task.jsx";
 import Loading from "./Loading.jsx";
 
 export default function EventUpdate({ taskid }) {
-
   const [task, setTask] = useState(null);
   const [tasks, setTasks] = useRecoilState(taskList);
   const [selectedDate, setSelectedDate] = useState(null);

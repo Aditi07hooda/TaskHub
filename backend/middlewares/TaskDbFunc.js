@@ -1,9 +1,15 @@
-import taskdb from "../models/TaskDb.js"
+import taskdb from "../models/TaskDb.js";
 
 const insertTask = (todoitem, user_id) => {
   taskdb.query(
     "INSERT INTO Task (id, user_id, title, description, enddate) VALUES (?, ?, ?, ?, ?)",
-    [todoitem.id, user_id, todoitem.title, todoitem.description, todoitem.enddate],
+    [
+      todoitem.id,
+      user_id,
+      todoitem.title,
+      todoitem.description,
+      todoitem.enddate,
+    ],
     (error, results, fields) => {
       if (error) {
         console.error("Error creating task:", error);
@@ -13,7 +19,6 @@ const insertTask = (todoitem, user_id) => {
     }
   );
 };
-
 
 const deleteTask = (id, callback) => {
   taskdb.query(
@@ -33,7 +38,7 @@ const deleteTask = (id, callback) => {
         }
       }
     }
-  )
+  );
 };
 
 const updateTask = (id, updatedTask, callback) => {
@@ -66,6 +71,20 @@ const updateTask = (id, updatedTask, callback) => {
   });
 };
 
+const updateTaskStatus = (taskId, newStatus, callback) => {
+  taskdb.query(
+    "UPDATE Task SET status = ? WHERE id = ?",
+    [newStatus, taskId],
+    (error, results, fields) => {
+      if (error) {
+        callback(error);
+      } else {
+        callback(null);
+      }
+    }
+  );
+};
+
 const readTask = (user_id, callback) => {
   taskdb.query(
     "SELECT * FROM Task WHERE user_id = ?",
@@ -95,5 +114,4 @@ const readTaskById = (user_id, taskId, callback) => {
   );
 };
 
-
-export { insertTask, deleteTask, updateTask, readTask, readTaskById };
+export { insertTask, deleteTask, updateTask, readTask, readTaskById, updateTaskStatus };

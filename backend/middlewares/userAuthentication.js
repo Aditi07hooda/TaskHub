@@ -15,7 +15,7 @@ export const isAuthenticated = async (req, res, next) => {
   const { token } = req.cookies;
 
   if (!token) {
-    res.status(401).send("Authentication failed. no token found");
+    return res.status(401).send("Authentication failed. no token found");
   }
 
   try {
@@ -27,15 +27,13 @@ export const isAuthenticated = async (req, res, next) => {
       (error, results, fields) => {
         if (error) {
           console.error('Authentication Error:', error);
-          res.status(401).send('Authentication failed');
-          return;
+          return res.status(401).send('Authentication failed');
         }
 
         const user = results[0];
 
         if (!user) {
-          res.status(401).send("User not found");
-          return;
+          return res.status(401).send("User not found");
         }
 
         req.user = user;
@@ -46,6 +44,7 @@ export const isAuthenticated = async (req, res, next) => {
     return res.status(401).send('Authentication failed');
   }
 };
+
 
 
 export default userValidation;

@@ -27,6 +27,7 @@ export default function Dashboard() {
   }, [isAuthenticated]);
 
   const [tasks, setTasks] = useRecoilState(taskList);
+  
   const [events, setEvents] = useRecoilState(eventList);
   const [projects, setProjects] = useRecoilState(projectList);
   const [projectDetailed, setprojectDetailed] = useRecoilState(
@@ -67,7 +68,7 @@ export default function Dashboard() {
     );
     setprojectDetailed(updatedEventListResponse.data);
     setProjectNo((prevProject) => ({projectNo: prevProject.projectNo - 1}))
-  };
+  }; 
 
   return (
     <div>
@@ -171,7 +172,7 @@ export default function Dashboard() {
               {/* table */}
               <div>
                 <TaskTable
-                  tasks={tasks}
+                  tasks={tasks}                  
                   onDelete={handleDeleteTask}
                   className="mx-8"
                 />

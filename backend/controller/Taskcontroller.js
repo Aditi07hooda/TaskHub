@@ -4,6 +4,7 @@ import {
   deleteTask,
   updateTask,
   readTask,
+  updateTaskStatus,
   readTaskById
 } from "../middlewares/TaskDbFunc.js";
 
@@ -42,10 +43,15 @@ export const createtask = (req, res) => {
   };
 
   const user_id = req.user.user_id
-  insertTask(todoitem, user_id);
-  res.status(201).json({
-    message: 'New task added successfully!',
-    task: todoitem,
+  insertTask(todoitem, user_id, (error) => {
+    if (error) {
+      console.error("Error creating task:", error);
+      return res.status(500).json({ message: 'Failed to create task' });
+    }
+    res.status(201).json({
+      message: 'New task added successfully!',
+      task: todoitem,
+    });
   });
 };
 
@@ -68,6 +74,18 @@ export const updatetask = (req, res) => {
       return res.status(500).send("Internal Server Error");
     }
     return res.send("Task updated");
+  });
+};
+
+export const updatetaskstatus = (req, res) => {
+  const id = req.params.taskId;
+  const newStatus = req.body.status;
+  updateTaskStatus(id, newStatus, (error) => {
+    if (error) {
+      console.error("Error updating task status in the database:", error);
+      return res.status(500).send("Internal Server Error");
+    }
+    return res.send("Task status updated");
   });
 };
 

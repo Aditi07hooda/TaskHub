@@ -9,6 +9,7 @@ import {
   readTaskIndividual,
   readtask,
   updatetask,
+  updatetaskstatus
 } from "../controller/Taskcontroller.js";
 import { isAuthenticated } from "../middlewares/userAuthentication.js";
 
@@ -23,6 +24,8 @@ router.post("/todos", TaskAuthentication, isAuthenticated, createtask);
 router.delete("/todos/:taskId", isAuthenticated, deletetask);
 
 router.put("/todos/:taskId", updateTaskValidation, isAuthenticated, updatetask);
+
+router.put("/todos/individual/:taskId", isAuthenticated, updatetaskstatus);
 
 router.get("/todos/pending", isAuthenticated, pending);
 
