@@ -7,7 +7,7 @@ import axios from "axios";
 import { format } from "date-fns";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { taskList } from "../state/Task";
-import { taskCount } from "../state/Count";
+import { taskCount } from "../state/Count"
 
 export default function TaskCreate() {
   const [selectedDate, setSelectedDate] = useState(null);
@@ -49,9 +49,11 @@ export default function TaskCreate() {
           withCredentials: true,
         }
       );
+      console.log(updatedTaskListResponse.data)
 
       const updatedTaskList = updatedTaskListResponse.data || [];
       setTasks(updatedTaskList);
+      console.log(updatedTaskList)
       setTaskNo(() => ({taskNo: updatedTaskList.length}))
 
       setTitle("");

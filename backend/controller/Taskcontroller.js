@@ -53,7 +53,7 @@ export const createtask = (req, res) => {
       task: todoitem,
     });
   });
-};
+}
 
 export const deletetask = (req, res) => {
   const id = req.params.taskId;

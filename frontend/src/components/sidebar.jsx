@@ -7,6 +7,7 @@ import {
   CDBSidebarMenu,
   CDBSidebarMenuItem } from "cdbreact";
 import { NavLink } from "react-router-dom";
+import { AiOutlineProject } from "react-icons/ai";
 
 const Sidebar = () => {
 
@@ -44,13 +45,34 @@ const Sidebar = () => {
             <NavLink
               exact
               to="/task"
-              target="_blank"
               activeClassName="activeClicked"
             >
               <CDBSidebarMenuItem
                 icon="circle"
               >
                 Task
+              </CDBSidebarMenuItem>
+            </NavLink>
+            <NavLink
+              exact
+              to="/event"
+              activeClassName="activeClicked"
+            >
+              <CDBSidebarMenuItem
+                icon="circle"
+              >
+                Event
+              </CDBSidebarMenuItem>
+            </NavLink>
+            <NavLink
+              exact
+              to="/project"
+              activeClassName="activeClicked"
+            >
+              <CDBSidebarMenuItem
+                icon="circle"
+              >
+                Project
               </CDBSidebarMenuItem>
             </NavLink>
             <NavLink

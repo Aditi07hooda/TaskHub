@@ -1,6 +1,6 @@
 import taskdb from "../models/TaskDb.js";
 
-const insertTask = (todoitem, user_id) => {
+const insertTask = (todoitem, user_id, callback) => {
   taskdb.query(
     "INSERT INTO Task (id, user_id, title, description, enddate) VALUES (?, ?, ?, ?, ?)",
     [
@@ -13,8 +13,12 @@ const insertTask = (todoitem, user_id) => {
     (error, results, fields) => {
       if (error) {
         console.error("Error creating task:", error);
+        // Pass the error to the callback function
+        callback(error);
       } else {
         console.log("New task added in db");
+        // Call the callback function without an error
+        callback(null, results);
       }
     }
   );

@@ -1,4 +1,4 @@
-// TaskManagerTable.js
+// TaskTable.js
 
 import React, { useState, useEffect } from "react";
 import "../css/Table.css";
@@ -7,39 +7,30 @@ import TaskUpdate from "./TaskUpdate.jsx";
 import { ToastContainer, toast } from "react-toastify";
 import axios from "axios";
 
-const Table = ({ tasks, onDelete, onUpdate}) => {
+const Table = ({ tasks, onDelete, onUpdate }) => {
   const [showTaskUpdate, setShowTaskUpdate] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
   const [checkedTasks, setCheckedTasks] = useState({});
-
-  const handleUpdateClick = (eventId) => {
-    setSelectedTaskId(eventId);
-    setShowTaskUpdate(true);
-  };
-
-  const handleToggleTaskForm = () => {
-    setShowTaskUpdate(false);
-    setSelectedTaskId(null);
-  };
+  const [currentPage, setCurrentPage] = useState(1);
+  const [tasksPerPage, setTasksPerPage] = useState(5);
+  const [totalTasks, setTotalTasks] = useState(tasks.length);
 
   useEffect(() => {
     const fetchTaskStatuses = async () => {
       try {
         const taskStatuses = await Promise.all(
           tasks.map(async (task) => {
-            const taskId = task.id; // Destructure taskId from task object
+            const taskId = task.id;
             const response = await axios.get(
               `http://localhost:5001/todos/${taskId}`,
               {
                 withCredentials: true,
               }
             );
-            // console.log(response.data[0].status);
             return { [taskId]: response.data[0].status };
           })
         );
         const initialStatuses = Object.assign({}, ...taskStatuses);
-        // console.log(initialStatuses)
         setCheckedTasks(initialStatuses);
       } catch (error) {
         console.error("Error fetching task statuses:", error);
@@ -52,39 +43,16 @@ const Table = ({ tasks, onDelete, onUpdate}) => {
   const handleCheckboxTaskChange = async (taskId) => {
     try {
       const currentStatus = checkedTasks[taskId]; // Get the current status
-      if(currentStatus == "completed"){
-        const confirmation =  confirm("Are you sure you want to change status to pending")
-        if(!confirmation){
-          return toast.info("Okk")
-        }
-        else{
-          const newStatus = currentStatus === "pending" ? "completed" : "pending"; // Toggle between "pending" and "completed"
-      
-          // Update task status in the database
-          await axios.put(
-            `http://localhost:5001/todos/individual/${taskId}`,
-            { status: newStatus },
-            {
-              headers: {
-                "Content-Type": "application/json",
-              },
-              withCredentials: true,
-            }
-          );
-      
-          // Update local state after successful update
-          setCheckedTasks((prevCheckedTasks) => ({
-            ...prevCheckedTasks,
-            [taskId]: newStatus,
-          }));
-          toast.success("Event updated successfully!", {
-            autoClose: 2000,
-          });
-        }
-      }else{
+      if (currentStatus == "completed") {
+        const confirmation = confirm(
+          "Are you sure you want to change status to pending"
+        );
+        if (!confirmation) {
+          return toast.info("Okk");
+        } else {
+          const newStatus =
+            currentStatus === "pending" ? "completed" : "pending"; // Toggle between "pending" and "completed"
 
-        const newStatus = currentStatus === "pending" ? "completed" : "pending"; // Toggle between "pending" and "completed"
-      
           // Update task status in the database
           await axios.put(
             `http://localhost:5001/todos/individual/${taskId}`,
@@ -96,7 +64,7 @@ const Table = ({ tasks, onDelete, onUpdate}) => {
               withCredentials: true,
             }
           );
-      
+
           // Update local state after successful update
           setCheckedTasks((prevCheckedTasks) => ({
             ...prevCheckedTasks,
@@ -105,14 +73,56 @@ const Table = ({ tasks, onDelete, onUpdate}) => {
           toast.success("Task updated successfully!", {
             autoClose: 2000,
           });
+        }
+      } else {
+        const newStatus = currentStatus === "pending" ? "completed" : "pending"; // Toggle between "pending" and "completed"
+
+        // Update task status in the database
+        await axios.put(
+          `http://localhost:5001/todos/individual/${taskId}`,
+          { status: newStatus },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+            withCredentials: true,
+          }
+        );
+
+        // Update local state after successful update
+        setCheckedTasks((prevCheckedTasks) => ({
+          ...prevCheckedTasks,
+          [taskId]: newStatus,
+        }));
+        toast.success("Task updated successfully!", {
+          autoClose: 2000,
+        });
       }
     } catch (error) {
       console.error("Error updating task status:", error);
     }
-  }; 
+  };
+
+  const handleUpdateClick = (eventId) => {
+    setSelectedTaskId(eventId);
+    setShowTaskUpdate(true);
+  };
+
+  const handleToggleTaskForm = () => {
+    setShowTaskUpdate(false);
+    setSelectedTaskId(null);
+  };
+
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const indexOfLastTask = currentPage * tasksPerPage;
+  const indexOfFirstTask = indexOfLastTask - tasksPerPage;
+  const currentTasks = tasks.slice(indexOfFirstTask, indexOfLastTask);
 
   return (
-    <div className="task-manager-table-container">
+    <div className="task-manager-table-container flex flex-col items-end">
       <table className="task-manager-table">
         <thead>
           <tr>
@@ -125,7 +135,7 @@ const Table = ({ tasks, onDelete, onUpdate}) => {
           </tr>
         </thead>
         <tbody>
-          {tasks.map((task) => (
+          {currentTasks.map((task) => (
             <tr key={task.id}>
               <td>{task.title}</td>
               <td>{task.description}</td>
@@ -134,12 +144,12 @@ const Table = ({ tasks, onDelete, onUpdate}) => {
                 <label className="flex items-center">
                   <input
                     type="checkbox"
-                    checked={checkedTasks[task.id] === "completed" ? "completed" : ""}
+                    checked={
+                      checkedTasks[task.id] === "completed" ? "completed" : ""
+                    }
                     onChange={() => handleCheckboxTaskChange(task.id)}
                   />
-                  <span className="ml-2">
-                    {checkedTasks[task.id]}
-                  </span>
+                  <span className="ml-2">{checkedTasks[task.id]}</span>
                 </label>
               </td>
               <td>
@@ -172,7 +182,42 @@ const Table = ({ tasks, onDelete, onUpdate}) => {
           ))}
         </tbody>
       </table>
-      <ToastContainer/>
+      <div class="pagination mt-2 gap-2">
+        <button
+          class={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ${
+            currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+          disabled={currentPage === 1}
+          onClick={() => paginate(currentPage - 1)}
+        >
+          Previous
+        </button>
+        {/* {Array(Math.ceil(totalTasks / tasksPerPage))
+          .fill(0)
+          .map((_, index) => (
+            <button
+              key={index}
+              class={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ${
+                currentPage === index + 1 ? "bg-blue-700" : ""
+              }`}
+              onClick={() => paginate(index + 1)}
+            >
+              {index + 1}
+            </button>
+          ))} */}
+        <button
+          class={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ${
+            currentPage === Math.ceil(totalTasks / tasksPerPage)
+              ? "opacity-50 cursor-not-allowed"
+              : ""
+          }`}
+          disabled={currentPage === Math.ceil(totalTasks / tasksPerPage)}
+          onClick={() => paginate(currentPage + 1)}
+        >
+          Next
+        </button>
+      </div>
+      <ToastContainer />
     </div>
   );
 };

@@ -5,6 +5,9 @@ import { Profile } from "./page/Profile";
 import Calendars from "./page/Calendars"
 import { Signup } from "./page/Signup";
 import Login from "./page/Login"
+import Task from "./page/Task"
+import Project from "./page/Project"
+import Event from "./page/Event"
 import EventUpdate from "./components/EventUpdate";
 
 const Routing = () => {
@@ -15,6 +18,9 @@ const Routing = () => {
         <Route exact path="/signup" element={<Signup />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/task" element={<Task />} />
+        <Route path="/project" element={<Project />} />
+        <Route path="/event" element={<Event />} />
         <Route path="/calendar" element={<Calendars />} />
         <Route path="/updateEvent/:eventId" element={<EventUpdate/>} />
       </Routes>

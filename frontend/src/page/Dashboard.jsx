@@ -53,6 +53,7 @@ export default function Dashboard() {
     setEvents((prevEvent) => prevEvent.filter((event) => event.id !== eventId));
     setEventNo((prevEvent) => ({ eventNo: prevEvent.eventNo - 1 }));
   };
+  
   const handleDeleteProject = async (projectId) => {
     await axios.delete(`http://localhost:5001/Project/${projectId}`, {
       withCredentials: true,
